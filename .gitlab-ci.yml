@@ -1,0 +1,13 @@
+stages:
+  - build
+
+build-docker-image:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - docker info
+    - docker build -t snipeit:test .
