@@ -7,6 +7,7 @@ services:
     image: snipe/snipe-it:${APP_VERSION:-latest}
     restart: unless-stopped
     volumes:
+      - ./:/var/www/html
       - storage:/var/lib/snipeit
     ports:
       - "${APP_PORT:-8000}:80"
@@ -19,10 +20,13 @@ services:
   db:
     image: mariadb:11.4
     restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: snipeit
+      MYSQL_USER: snipeit
+      MYSQL_PASSWORD: snipeit
     volumes:
       - db_data:/var/lib/mysql
-    env_file:
-      - .env
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect"]
       interval: 10s
