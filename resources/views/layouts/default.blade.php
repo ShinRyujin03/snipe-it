@@ -1761,19 +1761,12 @@
                     <div class="pull-left footer-links">
                          {!! trans('general.footer_credit') !!}
 
-                        <a target="_blank" href="https://bsky.app/profile/snipeitapp.com" rel="noopener" data-tooltip="true" data-title="Join us on Bluesky">
-                            <i class="fa-brands fa-square-bluesky"></i>
+                        <a target="_blank" href="https://www.facebook.com/mobifoneglobal2025" rel="noopener" data-tooltip="true" data-title="Theo dõi chúng tôi trên Facebook">
+                            <i class="fa-brands fa-facebook"></i>
                         </a>
-                        <a target="_blank" href="https://hachyderm.io/@grokability" rel="noopener" data-tooltip="true" data-title="Join us on Github">
-                            <i class="fa-brands fa-square-github"></i>
+                        <a target="_blank" href="https://www.youtube.com/@kenhcongnghemobifoneglobal9081" rel="noopener" data-tooltip="true" data-title="Theo dõi chúng tôi trên Youtube">
+                            <i class="fa-brands fa-youtube-square"></i>
                         </a>
-                        <a target="_blank" href="https://hachyderm.io/@grokability" rel="noopener" data-tooltip="true" data-title="Join us on Mastodon">
-                            <i class="fa-brands fa-mastodon"></i>
-                        </a>
-                        <a target="_blank" href="https://discord.gg/yZFtShAcKk" rel="noopener" data-tooltip="true" data-title="Join us on Discord">
-                            <i class="fa-brands fa-discord"></i>
-                        </a>
-
                     </div>
                     <div class="pull-right">
                     @if ($snipeSettings->version_footer!='off')
