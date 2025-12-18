@@ -1,0 +1,31 @@
+server {$
+    listen 80;$
+    server_name baohanh.mobifoneglobal.vn;$
+$
+    return 301 https://$host$request_uri;  # HTTP M-bM-^FM-^R HTTPS$
+}$
+$
+server {$
+    listen 443 ssl http2;$
+    server_name baohanh.mobifoneglobal.vn;$
+$
+    ssl_certificate /etc/letsencrypt/live/baohanh.mobifoneglobal.vn/fullchain.pem;$
+    ssl_certificate_key /etc/letsencrypt/live/baohanh.mobifoneglobal.vn/privkey.pem;$
+$
+    location / {$
+        # Proxy tM-aM-;M-^[i container bM-aM-:M-1ng tM-CM-*n trong Docker network$
+        proxy_pass http:/127.0.0.1:8000;$
+$
+        # Header bM-aM-:M-/t buM-aM-;M-^Yc M-DM-^QM-aM-;M-^C Snipe-IT nhM-aM-:M--n HTTPS$
+        proxy_set_header Host $host;$
+        proxy_set_header X-Real-IP $remote_addr;$
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;$
+        proxy_set_header X-Forwarded-Proto https;$
+        proxy_set_header X-Forwarded-Port 443;$
+        proxy_set_header X-Forwarded-Ssl on;$
+$
+        # Timeout (nM-aM-:M-?u cM-aM-:M-'n)$
+        proxy_read_timeout 300;$
+        proxy_connect_timeout 300;$
+    }$
+}$
