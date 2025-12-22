@@ -14,6 +14,7 @@ services:
     env_file:
       - .env
     volumes:
+      - ./docker/php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
       - ./:/var/www/html
     depends_on:
       - db

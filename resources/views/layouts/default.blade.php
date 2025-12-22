@@ -50,7 +50,7 @@
             --main-footer-bg-color: light-dark(#ffffff,#3d4144);
             --main-footer-text-color: light-dark(#605e5e, #d2d6de);
             --main-footer-top-border-color: light-dark(#d2d6de,#605e5e);
-            --main-theme-color: {{ $snipeSettings->header_color ?? '#3c8dbc' }};
+            --main-theme-color: {{ $snipeSettings->header_color ?? '#0061AF' }};
             --nav-hover-text-color: {{ $nav_link_color ?? 'hsl(from var(--main-theme-color) h s calc(l - 10))' }};
             --nav-primary-text-color: {{ $nav_link_color ?? '#ffffff' }};
             --search-highlight: #e9d15b;
@@ -1761,17 +1761,11 @@
                     <div class="pull-left footer-links">
                          {!! trans('general.footer_credit') !!}
 
-                        <a target="_blank" href="https://bsky.app/profile/snipeitapp.com" rel="noopener" data-tooltip="true" data-title="Join us on Bluesky">
-                            <i class="fa-brands fa-square-bluesky"></i>
+                        <a target="_blank" href="https://www.youtube.com/@kenhcongnghemobifoneglobal9081" rel="noopener" data-tooltip="true" data-title="Theo dõi chúng tôi trên Youtube">
+                            <i class="fa-brands fa-square-youtube"></i>
                         </a>
-                        <a target="_blank" href="https://hachyderm.io/@grokability" rel="noopener" data-tooltip="true" data-title="Join us on Github">
-                            <i class="fa-brands fa-square-github"></i>
-                        </a>
-                        <a target="_blank" href="https://hachyderm.io/@grokability" rel="noopener" data-tooltip="true" data-title="Join us on Mastodon">
-                            <i class="fa-brands fa-mastodon"></i>
-                        </a>
-                        <a target="_blank" href="https://discord.gg/yZFtShAcKk" rel="noopener" data-tooltip="true" data-title="Join us on Discord">
-                            <i class="fa-brands fa-discord"></i>
+                        <a target="_blank" href="https://www.facebook.com/mobifoneglobal2025" rel="noopener" data-tooltip="true" data-title="Theo dõi chúng tôi trên Facebook">
+                            <i class="fa-brands fa-square-facebook"></i>
                         </a>
 
                     </div>
