@@ -108,10 +108,10 @@ return [
     'upcoming-audits_click' => 'This email may not contain the full list so as not to exceed email size limits. Click on the button below to view all assets due for audit.',
     'user' => 'Người dùng',
     'username' => 'Tên đăng nhập',
-    'unaccepted_asset_reminder' => 'Reminder: You have Unaccepted Items',
+    'unaccepted_asset_reminder' => 'Thông báo: Bạn có các mặt hàng chưa được chấp nhận',
     'welcome' => 'Chào mừng: tên',
     'welcome_to' => 'Chào mừng đến với: web!',
     'your_assets' => 'Xen qua tài sản của bạn',
     'your_credentials' => 'Thông tin về Snipe-IT của bạn',
-    'mail_sent' => 'Mail sent successfully!',
+    'mail_sent' => 'Đã gửi thư thành công!',
 ];

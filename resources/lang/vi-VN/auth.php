@@ -15,6 +15,6 @@ return array(
 
     'failed' => 'Thông tin tài khoản không tìm thấy trong hệ thống.',
     'password' => 'Mật khẩu được cung cấp không chính xác.',
-    'throttle' => 'Too many login attempts. Please try again in :minutes minute(s).',
+    'throttle' => 'Đã đăng nhập sai quá nhiều lând. Vui lòng thử lại trong :minutes phút.',
 
 );

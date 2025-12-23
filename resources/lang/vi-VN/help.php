@@ -31,5 +31,5 @@ return [
 
     'depreciations' => 'Bạn có thể thiết lập khấu hao tài sản để khấu hao tài sản dựa trên khấu hao đường thẳng.',
     
-    'empty_file'    => 'The importer detects that this file is empty.'
+    'empty_file'    => 'Trình nhập khẩu phát hiện tệp này trống.'
 ];
