@@ -1,13 +1,31 @@
 stages:
   - build
+  - deploy
 
-build-docker-image:
+variables:
+  IMAGE_NAME: snipeit
+  IMAGE_TAG: test
+
+build_image:
   stage: build
-  image: docker:24
-  services:
-    - docker:24-dind
-  variables:
-    DOCKER_TLS_CERTDIR: ""
+  tags:
+    - test
   script:
-    - docker info
-    - docker build -t snipeit:test .
+    - echo "=== BUILD IMAGE ==="
+    - docker version
+    - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+
+deploy_test:
+  stage: deploy
+  tags:
+    - test
+  script:
+    - echo "=== DEPLOY TEST ==="
+    - docker stop snipeit-test || true
+    - docker rm snipeit-test || true
+    - docker run -d \
+        --name snipeit-test \
+        -p 8080:80 \
+        --env-file .env.test \
+        $IMAGE_NAME:$IMAGE_TAG
+
