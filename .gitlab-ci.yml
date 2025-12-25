@@ -1,10 +1,13 @@
 stages:
   - build
-  - deploy
+  - test
 
 variables:
   IMAGE_NAME: snipeit
   IMAGE_TAG: test
+
+before_script:
+  - docker info
 
 build_image:
   stage: build
@@ -12,20 +15,22 @@ build_image:
     - test
   script:
     - echo "=== BUILD IMAGE ==="
-    - docker version
-    - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+    - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+    - docker images | grep ${IMAGE_NAME}
 
-deploy_test:
-  stage: deploy
+run_test:
+  stage: test
   tags:
     - test
   script:
-    - echo "=== DEPLOY TEST ==="
+    - echo "=== DEPLOY TEST CONTAINER ==="
     - docker stop snipeit-test || true
     - docker rm snipeit-test || true
     - docker run -d \
         --name snipeit-test \
         -p 8080:80 \
         --env-file .env.test \
-        $IMAGE_NAME:$IMAGE_TAG
-
+        ${IMAGE_NAME}:${IMAGE_TAG}
+    - sleep 10
+    - echo "=== TEST HTTP ==="
+    - curl -I http://localhost:8080 || exit 1
