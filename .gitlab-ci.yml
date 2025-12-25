@@ -1,15 +1,47 @@
 stages:
   - test
 
+variables:
+  IMAGE_NAME: snipeit
+  IMAGE_TAG: test
+  CONTAINER_NAME: snipeit-test
+
 run_test:
   stage: test
   tags:
     - test
   script:
+    - echo "=== DOCKER INFO ==="
     - docker info
-    - docker build -t snipeit:test .
-    - docker stop snipeit-test || true
-    - docker rm snipeit-test || true
-    - docker run -d --name snipeit-test -p 8080:80 --env-file .env.test snipeit:test
-    - sleep 10
-    - curl -I http://localhost:8080
+
+    - echo "=== BUILD IMAGE ==="
+    - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+
+    - echo "=== CLEAN OLD CONTAINER ==="
+    - docker stop ${CONTAINER_NAME} || true
+    - docker rm ${CONTAINER_NAME} || true
+
+    - echo "=== RUN TEST CONTAINER ==="
+    - |
+      docker run -d \
+        --name ${CONTAINER_NAME} \
+        -p 8080:80 \
+        -e APP_ENV=testing \
+        -e APP_DEBUG=false \
+        -e APP_KEY=${APP_KEY} \
+        -e DB_CONNECTION=mysql \
+        -e DB_HOST=${DB_HOST} \
+        -e DB_PORT=3306 \
+        -e DB_DATABASE=${DB_DATABASE} \
+        -e DB_USERNAME=${DB_USERNAME} \
+        -e DB_PASSWORD=${DB_PASSWORD} \
+        -e MAIL_MAILER=log \
+        -e CACHE_DRIVER=file \
+        -e SESSION_DRIVER=file \
+        ${IMAGE_NAME}:${IMAGE_TAG}
+
+    - echo "=== WAIT APP BOOT ==="
+    - sleep 15
+
+    - echo "=== HTTP TEST ==="
+    - curl -I http://localhost:8080 || exit 1
