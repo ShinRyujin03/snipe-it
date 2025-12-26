@@ -1,20 +1,23 @@
 stages:
   - test
+
 variables:
   IMAGE_NAME: snipeit
   IMAGE_TAG: test
   CONTAINER_NAME: snipeit-test
   APP_PORT: 8080
-test_snipeit:
+
+test_app:
   stage: test
   tags:
     - test
+
   script:
     - echo "=== DOCKER INFO ==="
     - docker info
 
     - echo "=== BUILD IMAGE ==="
-    - docker build -f snipe-it/Dockerfile -t ${IMAGE_NAME}:${IMAGE_TAG} snipe-it
+    - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
 
     - echo "=== CLEAN OLD CONTAINER ==="
     - docker rm -f ${CONTAINER_NAME} || true
@@ -32,7 +35,7 @@ test_snipeit:
     - echo "=== WAIT APP BOOT ==="
     - sleep 20
 
-    - echo "=== LARAVEL KEY ==="
+    - echo "=== APP KEY ==="
     - docker exec ${CONTAINER_NAME} php artisan key:generate --force || true
 
     - echo "=== HEALTH CHECK ==="
