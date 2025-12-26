@@ -1,9 +1,6 @@
-workflow:
-  rules:
-    - when: always
-
 stages:
   - test
+  - cleanup
 
 variables:
   IMAGE_NAME: snipeit
@@ -14,7 +11,7 @@ variables:
 test_snipeit:
   stage: test
   tags:
-    - test   # đúng tag runner của bạn
+    - test
   script:
     - set -e
 
@@ -23,16 +20,11 @@ test_snipeit:
     - ls -lah
     - test -f Dockerfile
 
-    - echo "=== DOCKER INFO ==="
-    - docker info
-
     - echo "=== BUILD IMAGE ==="
     - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
 
-    - echo "=== CLEAN OLD CONTAINER ==="
-    - docker rm -f ${CONTAINER_NAME} || true
-
     - echo "=== RUN CONTAINER ==="
+    - docker rm -f ${CONTAINER_NAME} || true
     - docker run -d \
         --name ${CONTAINER_NAME} \
         -p ${APP_PORT}:80 \
@@ -42,18 +34,20 @@ test_snipeit:
         -e DB_DATABASE=/tmp/database.sqlite \
         ${IMAGE_NAME}:${IMAGE_TAG}
 
-    - echo "=== WAIT FOR APP BOOT ==="
+    - echo "=== WAIT FOR BOOT ==="
     - sleep 25
 
-    - echo "=== GENERATE APP KEY ==="
     - docker exec ${CONTAINER_NAME} php artisan key:generate --force
-
-    - echo "=== HEALTH CHECK ==="
     - curl -f http://localhost:${APP_PORT}
 
-  after_script:
-    - echo "=== CONTAINER LOGS ==="
+cleanup_snipeit:
+  stage: cleanup
+  tags:
+    - test
+  when: always
+  script:
+    - echo "=== CONTAINER LOGS (ALWAYS) ==="
     - docker logs ${CONTAINER_NAME} || true
 
-    - echo "=== CLEANUP ==="
+    - echo "=== CLEANUP (ALWAYS) ==="
     - docker rm -f ${CONTAINER_NAME} || true
