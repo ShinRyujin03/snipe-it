@@ -3,32 +3,53 @@ stages:
 
 variables:
   IMAGE_NAME: snipeit
-  IMAGE_TAG: test
-  CONTAINER_NAME: snipeit-test
+  IMAGE_TAG: ci
+  CONTAINER_NAME: snipeit-ci
   APP_PORT: 8080
 
 test_snipeit:
   stage: test
   tags:
-    - test
-
-  before_script:
-    - git clean -ffdx
-
+    - test   # đúng tag runner của bạn
   script:
+    - set -e
+
+    - echo "=== CI CONTEXT ==="
+    - pwd
+    - ls -lah
+    - test -f Dockerfile
+
     - echo "=== DOCKER INFO ==="
     - docker info
 
     - echo "=== BUILD IMAGE ==="
-    - docker build -f Dockerfile -t ${IMAGE_NAME}:${IMAGE_TAG} .
+    - docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+
+    - echo "=== CLEAN OLD CONTAINER ==="
+    - docker rm -f ${CONTAINER_NAME} || true
 
     - echo "=== RUN CONTAINER ==="
-    - docker rm -f ${CONTAINER_NAME} || true
-    - docker run -d --name ${CONTAINER_NAME} -p ${APP_PORT}:80 ${IMAGE_NAME}:${IMAGE_TAG}
+    - docker run -d \
+        --name ${CONTAINER_NAME} \
+        -p ${APP_PORT}:80 \
+        -e APP_ENV=testing \
+        -e APP_DEBUG=true \
+        -e DB_CONNECTION=sqlite \
+        -e DB_DATABASE=/tmp/database.sqlite \
+        ${IMAGE_NAME}:${IMAGE_TAG}
 
-    - sleep 10
-    - curl -I http://localhost:${APP_PORT}
+    - echo "=== WAIT FOR APP BOOT ==="
+    - sleep 25
+
+    - echo "=== GENERATE APP KEY ==="
+    - docker exec ${CONTAINER_NAME} php artisan key:generate --force
+
+    - echo "=== HEALTH CHECK ==="
+    - curl -f http://localhost:${APP_PORT}
 
   after_script:
+    - echo "=== CONTAINER LOGS ==="
     - docker logs ${CONTAINER_NAME} || true
+
+    - echo "=== CLEANUP ==="
     - docker rm -f ${CONTAINER_NAME} || true
