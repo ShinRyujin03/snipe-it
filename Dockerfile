@@ -1,9 +1,8 @@
-FROM php:8.2-apache
+FROM php:8.3-apache
 
-# Enable apache modules
 RUN a2enmod rewrite
 
-# System deps + PHP extensions
+# System deps + PHP ext
 RUN apt-get update && apt-get install -y \
     git unzip curl zip mariadb-client \
     libpng-dev libonig-dev libxml2-dev libzip-dev \
@@ -13,7 +12,6 @@ RUN apt-get update && apt-get install -y \
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# PHP config
 COPY docker/php.ini /usr/local/etc/php/conf.d/99-custom.ini
 
 # Apache docroot
