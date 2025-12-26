@@ -1,12 +1,10 @@
 stages:
   - test
-
 variables:
   IMAGE_NAME: snipeit
   IMAGE_TAG: test
   CONTAINER_NAME: snipeit-test
   APP_PORT: 8080
-
 test_snipeit:
   stage: test
   tags:
