@@ -1,33 +1,44 @@
 stages:
-  - deploy
+  - test
 
-deploy_to_test_vm:
-  stage: deploy
-
-  # BẮT BUỘC vì runner của bạn run_untagged = false
+test_on_vm:
+  stage: test
   tags:
     - test
-
   only:
     - internal-deploy
 
+  before_script:
+    - eval "$(ssh-agent -s)"
+    - ssh-add ~/.ssh/id_rsa
+    - mkdir -p ~/.ssh
+    - ssh-keyscan -H ptcn-qlda02 >> ~/.ssh/known_hosts
+
   script:
-    - echo "=== CHECK DOCKER ==="
-    - docker version
+    - |
+      ssh ptcn-qlda@ptcn-qlda02 << 'EOF'
+        set -e
 
-    - echo "=== STOP OLD CONTAINER ==="
-    - docker rm -f snipeit || true
+        echo "=== HOST ==="
+        hostname
+        whoami
 
-    - echo "=== BUILD IMAGE ==="
-    - docker build -t snipeit:ci .
+        echo "=== CLEAN ==="
+        docker rm -f snipeit || true
 
-    - echo "=== RUN CONTAINER ==="
-    - docker run -d \
-        --name snipeit \
-        -p 8080:80 \
-        snipeit:ci
+        cd /opt/snipe-it
 
-    - echo "=== VERIFY ==="
-    - sleep 5
-    - docker ps
-    - curl -I http://localhost:8080 || true
+        echo "=== BUILD ==="
+        docker build -t snipeit:ci .
+
+        echo "=== RUN ==="
+        docker run -d \
+          --name snipeit \
+          -p 8080:80 \
+          snipeit:ci
+
+        sleep 5
+
+        docker ps -a
+        curl -I http://localhost:8080
+      EOF
