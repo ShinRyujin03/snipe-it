@@ -6,7 +6,6 @@ services:
 variables:
   DOCKER_TLS_CERTDIR: ""
   DOCKER_HOST: tcp://docker:2375
-  DOCKER_DRIVER: overlay2
 
   IMAGE_NAME: snipeit
   IMAGE_TAG: test
@@ -21,33 +20,24 @@ stages:
 before_script:
   - docker info
 
-# --------------------------------------------------
-# BUILD IMAGE
-# --------------------------------------------------
 build_image:
   stage: build
   script:
-    - echo "=== BUILD DOCKER IMAGE ==="
+    - echo "=== BUILD IMAGE ==="
     - ls -la
     - ls -la snipe-it
     - test -f snipe-it/Dockerfile
     - docker build -f snipe-it/Dockerfile -t ${IMAGE_NAME}:${IMAGE_TAG} snipe-it
-    - docker images | grep ${IMAGE_NAME}
   rules:
     - if: '$CI_COMMIT_BRANCH == "internal-deploy"'
 
-# --------------------------------------------------
-# RUN & TEST CONTAINER
-# --------------------------------------------------
 run_test:
   stage: test
   needs:
     - build_image
   script:
-    - echo "=== CLEAN OLD CONTAINER ==="
     - docker rm -f ${CONTAINER_NAME} || true
 
-    - echo "=== RUN CONTAINER ==="
     - docker run -d \
         --name ${CONTAINER_NAME} \
         -p ${APP_PORT}:80 \
@@ -57,13 +47,10 @@ run_test:
         -e DB_DATABASE=/tmp/database.sqlite \
         ${IMAGE_NAME}:${IMAGE_TAG}
 
-    - echo "=== WAIT APP BOOT ==="
     - sleep 20
 
-    - echo "=== GENERATE APP KEY ==="
     - docker exec ${CONTAINER_NAME} php artisan key:generate --force
 
-    - echo "=== HTTP TEST ==="
     - curl -I http://localhost:${APP_PORT}
 
   after_script:
