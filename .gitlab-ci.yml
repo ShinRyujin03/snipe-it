@@ -7,7 +7,7 @@ variables:
   CONTAINER_NAME: snipeit-test
   APP_PORT: 8080
 
-test_app:
+test_snipeit:
   stage: test
   tags:
     - test
@@ -33,10 +33,7 @@ test_app:
         ${IMAGE_NAME}:${IMAGE_TAG}
 
     - echo "=== WAIT APP BOOT ==="
-    - sleep 20
-
-    - echo "=== APP KEY ==="
-    - docker exec ${CONTAINER_NAME} php artisan key:generate --force || true
+    - sleep 15
 
     - echo "=== HEALTH CHECK ==="
     - curl -I http://localhost:${APP_PORT}
