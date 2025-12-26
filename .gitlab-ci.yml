@@ -1,21 +1,12 @@
-image: docker:28.2.2
-
-services:
-  - docker:28.2.2-dind
-
-variables:
-  DOCKER_TLS_CERTDIR: ""
-  DOCKER_HOST: tcp://docker:2375
-
-  IMAGE_NAME: snipeit
-  IMAGE_TAG: test
-
-  CONTAINER_NAME: snipeit-test
-  APP_PORT: 8080
-
 stages:
   - build
   - test
+
+variables:
+  IMAGE_NAME: snipeit
+  IMAGE_TAG: test
+  CONTAINER_NAME: snipeit-test
+  APP_PORT: 8080
 
 before_script:
   - docker info
@@ -28,8 +19,6 @@ build_image:
     - ls -la snipe-it
     - test -f snipe-it/Dockerfile
     - docker build -f snipe-it/Dockerfile -t ${IMAGE_NAME}:${IMAGE_TAG} snipe-it
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "internal-deploy"'
 
 run_test:
   stage: test
@@ -50,12 +39,8 @@ run_test:
     - sleep 20
 
     - docker exec ${CONTAINER_NAME} php artisan key:generate --force
-
     - curl -I http://localhost:${APP_PORT}
 
   after_script:
     - docker logs ${CONTAINER_NAME} || true
     - docker rm -f ${CONTAINER_NAME} || true
-
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "internal-deploy"'
