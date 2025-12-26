@@ -1,26 +1,33 @@
 stages:
-  - run
+  - deploy
 
-run_on_test_vm:
-  stage: run
+deploy_to_test_vm:
+  stage: deploy
+
+  # BẮT BUỘC vì runner của bạn run_untagged = false
   tags:
     - test
+
   only:
     - internal-deploy
 
   script:
+    - echo "=== CHECK DOCKER ==="
+    - docker version
+
     - echo "=== STOP OLD CONTAINER ==="
-    - sudo docker rm -f snipeit || true
+    - docker rm -f snipeit || true
 
     - echo "=== BUILD IMAGE ==="
-    - sudo docker build -t snipeit:ci .
+    - docker build -t snipeit:ci .
 
     - echo "=== RUN CONTAINER ==="
-    - sudo docker run -d \
+    - docker run -d \
         --name snipeit \
         -p 8080:80 \
         snipeit:ci
 
     - echo "=== VERIFY ==="
     - sleep 5
+    - docker ps
     - curl -I http://localhost:8080 || true
