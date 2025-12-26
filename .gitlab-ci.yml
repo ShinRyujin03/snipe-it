@@ -1,5 +1,4 @@
 stages:
-  - build
   - test
 
 variables:
@@ -8,26 +7,42 @@ variables:
   CONTAINER_NAME: snipeit-test
   APP_PORT: 8080
 
-before_script:
-  - docker info
-
-build_image:
-  stage: build
-  tags: [test]
+test_snipeit:
+  stage: test
+  tags:
+    - test
   script:
+    - echo "=== DOCKER INFO ==="
+    - docker info
+
+    - echo "=== BUILD IMAGE ==="
     - docker build -f snipe-it/Dockerfile -t ${IMAGE_NAME}:${IMAGE_TAG} snipe-it
 
-run_test:
-  stage: test
-  tags: [test]
-  needs: [build_image]
-  script:
+    - echo "=== CLEAN OLD CONTAINER ==="
     - docker rm -f ${CONTAINER_NAME} || true
-    - docker run -d --name ${CONTAINER_NAME} -p ${APP_PORT}:80 ${IMAGE_NAME}:${IMAGE_TAG}
+
+    - echo "=== RUN CONTAINER ==="
+    - docker run -d \
+        --name ${CONTAINER_NAME} \
+        -p ${APP_PORT}:80 \
+        -e APP_ENV=testing \
+        -e APP_DEBUG=true \
+        -e DB_CONNECTION=sqlite \
+        -e DB_DATABASE=/tmp/database.sqlite \
+        ${IMAGE_NAME}:${IMAGE_TAG}
+
+    - echo "=== WAIT APP BOOT ==="
     - sleep 20
+
+    - echo "=== LARAVEL KEY ==="
     - docker exec ${CONTAINER_NAME} php artisan key:generate --force || true
+
+    - echo "=== HEALTH CHECK ==="
     - curl -I http://localhost:${APP_PORT}
 
   after_script:
+    - echo "=== CONTAINER LOGS ==="
     - docker logs ${CONTAINER_NAME} || true
+
+    - echo "=== CLEANUP ==="
     - docker rm -f ${CONTAINER_NAME} || true
