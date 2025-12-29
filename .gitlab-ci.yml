@@ -1,13 +1,8 @@
 stages:
   - deploy
 
-variables:
-  APP_DIR: "/opt/snipe-it"
-
 before_script:
-  - echo "=== CI CONTEXT ==="
   - whoami
-  - hostname
   - pwd
   - docker --version
   - docker compose version
@@ -16,32 +11,20 @@ deploy_test:
   stage: deploy
   environment:
     name: test
-
-  # 👉 RẤT NÊN dùng tag để tránh chạy nhầm runner
-  tags:
-    - test
-    - docker
-
   script:
-    - echo "=== DEPLOY SNIPE-IT TO TEST VM ==="
+    - echo "=== DEPLOY SNIPE-IT ON TEST VM ==="
+    - cd /opt/snipe-it
 
-    - echo "=== MOVE TO APP DIR ==="
-    - cd "$APP_DIR"
-
-    - echo "=== CURRENT FILES ==="
-    - ls -la
-
-    - echo "=== STOP OLD CONTAINERS ==="
+    - echo "=== STOP OLD CONTAINER ==="
     - docker compose down || true
 
-    - echo "=== PULL IMAGES ==="
+    - echo "=== PULL IMAGE ==="
     - docker compose pull
 
-    - echo "=== START CONTAINERS ==="
+    - echo "=== START CONTAINER ==="
     - docker compose up -d
 
-    - echo "=== CONTAINER STATUS ==="
+    - echo "=== STATUS ==="
     - docker ps -a
-
   only:
     - internal-deploy
