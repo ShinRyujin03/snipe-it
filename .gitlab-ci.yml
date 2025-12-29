@@ -2,44 +2,40 @@ stages:
   - test
   - deploy
 
-variables:
-  APP_DIR: "/opt/snipe-it"
-  CONTAINER_NAME: "snipeit"
-
 before_script:
-  - sudo docker --version
-  - sudo docker compose version || sudo docker-compose version
-# =========================
-# TEST docker-compose
-# =========================
+  - whoami
+  - pwd
+  - docker --version
+  - docker compose version || docker-compose version
+
 test_compose:
   stage: test
   script:
     - echo "=== CHECK docker-compose ==="
+    - ls -la
     - test -f docker-compose.yml
-    - sudo docker compose config
+    - docker compose config
   only:
-    - test
-# =========================
-# DEPLOY TO VM TEST (LOCAL)
-# =========================
+    - internal-deploy
+
 deploy_test:
   stage: deploy
   environment:
     name: test
   script:
-    - echo "=== DEPLOY LOCAL VM TEST ==="
+    - echo "=== DEPLOY ON TEST VM ==="
+    - pwd
+    - ls -la
+
     - echo "=== STOP OLD CONTAINER ==="
-    - sudo docker compose down || true
+    - docker compose down || true
 
     - echo "=== PULL IMAGE ==="
-    - sudo docker compose pull
+    - docker compose pull
 
     - echo "=== START CONTAINER ==="
-    - sudo docker compose up -d
+    - docker compose up -d
 
-    - echo "=== CONTAINER STATUS ==="
-    - sudo docker ps -a
-
+    - docker ps -a
   only:
     - internal-deploy
