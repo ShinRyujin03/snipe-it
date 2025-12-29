@@ -1,44 +1,55 @@
 stages:
   - test
+  - deploy
 
-test_on_vm:
+variables:
+  APP_DIR: "/opt/snipe-it"
+  CONTAINER_NAME: "snipeit"
+
+before_script:
+  - whoami
+  - pwd
+  - docker --version
+  - docker compose version || docker-compose version
+
+# =========================
+# TEST docker-compose
+# =========================
+test_compose:
   stage: test
-  tags:
+  script:
+    - echo "=== CHECK docker-compose ==="
+    - test -f docker-compose.yml
+    - docker compose config
+  only:
     - test
+
+# =========================
+# DEPLOY TO VM TEST (LOCAL)
+# =========================
+deploy_test:
+  stage: deploy
+  environment:
+    name: test
+  script:
+    - echo "=== DEPLOY LOCAL VM TEST ==="
+
+    - cd "$APP_DIR"
+
+    - echo "=== GIT PULL ==="
+    - git pull origin internal-deploy
+
+    - echo "=== STOP OLD CONTAINER ==="
+    - docker compose down || true
+
+    - echo "=== PULL IMAGE ==="
+    - docker compose pull
+
+    - echo "=== START CONTAINER ==="
+    - docker compose up -d
+
+    - echo "=== CONTAINER STATUS ==="
+    - docker ps -a
+
   only:
     - internal-deploy
-
-  before_script:
-    - eval "$(ssh-agent -s)"
-    - ssh-add ~/.ssh/id_rsa
-    - mkdir -p ~/.ssh
-    - ssh-keyscan -H ptcn-qlda02 >> ~/.ssh/known_hosts
-
-  script:
-    - |
-      ssh ptcn-qlda@ptcn-qlda02 << 'EOF'
-        set -e
-
-        echo "=== HOST ==="
-        hostname
-        whoami
-
-        echo "=== CLEAN ==="
-        docker rm -f snipeit || true
-
-        cd /opt/snipe-it
-
-        echo "=== BUILD ==="
-        docker build -t snipeit:ci .
-
-        echo "=== RUN ==="
-        docker run -d \
-          --name snipeit \
-          -p 8080:80 \
-          snipeit:ci
-
-        sleep 5
-
-        docker ps -a
-        curl -I http://localhost:8080
-      EOF
