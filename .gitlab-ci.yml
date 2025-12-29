@@ -6,36 +6,30 @@ before_script:
   - whoami
   - pwd
   - docker --version
-  - docker compose version || docker-compose version
+  - |
+    if docker compose version >/dev/null 2>&1; then
+      export DC="docker compose"
+    else
+      export DC="docker-compose"
+    fi
+  - $DC version
 
 test_compose:
   stage: test
   script:
-    - echo "=== CHECK docker-compose ==="
     - ls -la
     - test -f docker-compose.yml
-    - docker compose config
+    - $DC config
   only:
     - internal-deploy
 
 deploy_test:
   stage: deploy
-  environment:
-    name: test
   script:
-    - echo "=== DEPLOY ON TEST VM ==="
-    - pwd
-    - ls -la
-
-    - echo "=== STOP OLD CONTAINER ==="
-    - docker compose down || true
-
-    - echo "=== PULL IMAGE ==="
-    - docker compose pull
-
-    - echo "=== START CONTAINER ==="
-    - docker compose up -d
-
+    - echo "DEPLOY TEST"
+    - $DC down || true
+    - $DC pull
+    - $DC up -d
     - docker ps -a
   only:
     - internal-deploy
