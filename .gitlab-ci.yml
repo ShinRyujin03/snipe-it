@@ -31,12 +31,6 @@ deploy_test:
     name: test
   script:
     - echo "=== DEPLOY LOCAL VM TEST ==="
-
-    - cd "$APP_DIR"
-
-    - echo "=== GIT PULL ==="
-    - git pull origin internal-deploy
-
     - echo "=== STOP OLD CONTAINER ==="
     - docker compose down || true
 
