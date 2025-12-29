@@ -11,7 +11,6 @@ before_script:
   - pwd
   - docker --version
   - docker compose version || docker-compose version
-
 # =========================
 # TEST docker-compose
 # =========================
@@ -23,7 +22,6 @@ test_compose:
     - docker compose config
   only:
     - test
-
 # =========================
 # DEPLOY TO VM TEST (LOCAL)
 # =========================
